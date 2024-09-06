@@ -1,0 +1,75 @@
+Voici une procédure détaillée pour gérer les privilèges d'utilisateur dans une base de données, en utilisant SQL. Nous allons créer les tables, ajouter l'utilisateur, et définir les droits d'accès pour l'utilisateur Victoria.
+
+### 1. Créer les tables
+D'abord, créez les tables nécessaires dans votre base de données.
+
+```sql
+-- Créer la table RESET
+CREATE TABLE RESET (
+    id INT PRIMARY KEY,
+    info VARCHAR(255)
+);
+
+-- Créer la table EMPLOYES
+CREATE TABLE EMPLOYES (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    password VARCHAR(100) -- Colonne pour stocker le mot de passe
+);
+
+-- Créer la table DEPARTMENTS
+CREATE TABLE DEPARTMENTS (
+    id INT PRIMARY KEY,
+    department_name VARCHAR(100)
+);
+
+-- Créer la table TACHES
+CREATE TABLE TACHES (
+    id INT PRIMARY KEY,
+    task_name VARCHAR(100),
+    employee_id INT,
+    FOREIGN KEY (employee_id) REFERENCES EMPLOYES(id)
+);
+```
+
+### 2. Créer un nouvel utilisateur
+Créez un nouvel utilisateur nommé Victoria.
+
+```sql
+CREATE USER 'victoria'@'localhost' IDENTIFIED BY 'password'; -- Remplacez 'password' par un mot de passe sécurisé
+```
+
+### 3. Gérer les privilèges
+Maintenant, définissez les privilèges pour l'utilisateur Victoria selon les restrictions mentionnées.
+
+#### a. Interdire l'accès à la table RESET
+```sql
+REVOKE ALL PRIVILEGES ON RESET FROM 'victoria'@'localhost';
+```
+
+#### b. Accorder l'accès à la table EMPLOYES sans la colonne PASSWORD
+```sql
+GRANT SELECT (id, name) ON EMPLOYES TO 'victoria'@'localhost';
+```
+
+#### c. Accorder l'accès pour lister tous les départements, mais pas pour insérer ou mettre à jour
+```sql
+GRANT SELECT ON DEPARTMENTS TO 'victoria'@'localhost';
+REVOKE INSERT, UPDATE ON DEPARTMENTS FROM 'victoria'@'localhost';
+```
+
+#### d. Accorder l'accès pour lister et insérer dans la table TACHES, mais pas pour mettre à jour ou supprimer
+```sql
+GRANT SELECT, INSERT ON TACHES TO 'victoria'@'localhost';
+REVOKE UPDATE, DELETE ON TACHES FROM 'victoria'@'localhost';
+```
+
+### 4. Vérifier les privilèges
+Vous pouvez vérifier les privilèges de Victoria pour vous assurer qu'ils sont correctement appliqués.
+
+```sql
+SHOW GRANTS FOR 'victoria'@'localhost';
+```
+
+### 5. Conclusion
+Avec ces étapes, vous avez créé les tables nécessaires, ajouté l'utilisateur Victoria, et appliqué des restrictions sur ses privilèges d'accès. Assurez-vous de tester les accès de l'utilisateur pour valider que les restrictions fonctionnent comme prévu.
